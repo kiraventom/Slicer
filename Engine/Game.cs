@@ -1,34 +1,41 @@
-﻿namespace Engine
+﻿using System.Linq;
+
+namespace Engine
 {
 	public static class Game
 	{
 		public static Field Field { get; private set; }
-		public static bool DidLose {get; private set;}
+		public static bool Lost {get; private set;}
 		private static double _speed { get; set; }
 
 		public static void Initialize()
 		{
 			Field = new Field();
-			DidLose = false;
-			_speed = 1.0;
+			Lost = false;
+			_speed = 2.0;
 		}
 
 		public static void Tick(bool shouldPut)
 		{
-			if (DidLose)
+			if (Lost)
 				return;
 
 			if (shouldPut)
 			{
+				double floatingX = Field.Floating.X;
 				bool didLand = Field.Put();
 				if (!didLand)
 				{
-					DidLose = true;
+					Lost = true;
 					return;
 				}
 
-				_speed += 0.1;
-				Field.CreateFloating();
+				_speed += 0.05;
+
+				var topBlock = Field.Levels.Last();
+				double x = floatingX < topBlock.X ? topBlock.X : floatingX;
+				
+				Field.CreateFloating(x);
 			}
 
 			Field.Floating.Move(_speed);

@@ -4,43 +4,48 @@ using System.Linq;
 
 namespace Engine
 {
-	public class Field
-	{
-		public Field()
-		{
-			_levels = new();
-			_levels.Add(new Block(Width / 2, Width / 4));
-			CreateFloating();
-		}
+    public class Field
+    {
+        public Field()
+        {
+            _levels = new List<Block> { new Block(Width / 2, Width / 4) };
+            CreateFloating();
+        }
 
-		private List<Block> _levels { get; }
-		public IList<Block> Levels => _levels.AsReadOnly();
-		public Block Floating { get; private set; }
-		public const int Width = 600;
+        private List<Block> _levels { get; }
+        public IList<Block> Levels => _levels.AsReadOnly();
+        public Block Floating { get; private set; }
+        public const int Width = 700;
 
-		public void CreateFloating()
-		{
-			var topBlock = _levels.Last();
-			Floating = new(topBlock.Width, Width / 4, topBlock.IsMovingRight);
-		}
+        private void CreateFloating()
+        {
+            double x = Width / 2 - _levels.First().Width / 2;
+            CreateFloating(x);
+        }
 
-		public bool Put()
-		{
-			var topBlock = _levels.Last();
-			if (Floating.X >= topBlock.Right || Floating.Right <= topBlock.X)
-			{
-				return false;
-			}
+        public void CreateFloating(double x)
+        {
+            var topBlock = _levels.Last();
+            Floating = new Block(topBlock.Width, x, topBlock.IsMovingRight);
+        }
 
-			Floating.Width -= Math.Abs(Floating.X - topBlock.X);
-			if (Floating.X < topBlock.X)
-			{
-				Floating.X = topBlock.X;
-			}
+        public bool Put()
+        {
+            var topBlock = _levels.Last();
+            if (Floating.X >= topBlock.Right || Floating.Right <= topBlock.X)
+            {
+                return false;
+            }
 
-			_levels.Add(Floating);
-			Floating = null;
-			return true;
-		}
-	}
+            Floating.Width -= Math.Abs(Floating.X - topBlock.X);
+            if (Floating.X < topBlock.X)
+            {
+                Floating.X = topBlock.X;
+            }
+
+            _levels.Add(Floating);
+            Floating = null;
+            return true;
+        }
+    }
 }
